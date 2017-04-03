@@ -1,14 +1,31 @@
 FROM meitu/android-base:latest
+
 LABEL maintainer "Ligboy.Liu <ligboy@gmail.com>"
 
-# ------------------------------------------------------
-# --- Android Debug Keystore
-#RUN mkdir -p /root/.android
-#COPY ./android/debug.keystore /root/.android/debug.keystore
+# Environments
+# - Language
+RUN locale-gen en_US.UTF-8
+ENV LANG "en_US.UTF-8"
+ENV LANGUAGE "en_US.UTF-8"
+ENV LC_ALL "en_US.UTF-8"
 
-# Dependencies to execute Android builds
-RUN dpkg --add-architecture i386
-RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y --no-install-recommends \
+# ------------------------------------------------------
+# --- Base pre-installed tools
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+    dpkg --add-architecture i386 \
+    && apt-get install -y --no-install-recommends \
+    curl \
+    debconf-utils \
+    git \
+    mercurial \
+    python \
+    python-software-properties \
+    sudo \
+    software-properties-common \
+    tree \
+    unzip \
+    wget \
+    zip \
     libc6:i386 \
     libgcc1:i386 \
     libncurses5:i386 \
@@ -16,11 +33,27 @@ RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get update -qq && a
     libz1:i386 \
     && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 
+# ------------------------------------------------------
+# --- SSH config
+RUN mkdir -p /root/.ssh
+COPY ./ssh/config /root/.ssh/config
+
+# ------------------------------------------------------
+# --- Git config
+RUN git config --global user.email robot@meitu.com && git config --global user.name "Meitu Robot"
+
+# ------------------------------------------------------
+# --- Android Debug Keystore
+#RUN mkdir -p /root/.android
+#COPY ./android/debug.keystore /root/.android/debug.keystore
+
 ## Open JDK
 #RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y openjdk-8-jdk
 ## Oracle JDK
 RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | /usr/bin/debconf-set-selections
-RUN add-apt-repository -y ppa:webupd8team/java && apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN add-apt-repository -y ppa:webupd8team/java \
+    && DEBIAN_FRONTEND=noninteractive apt-get update -y -qq \
+    && apt-get install -y --no-install-recommends \
     oracle-java8-installer \
     oracle-java8-set-default \
     && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
