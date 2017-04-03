@@ -28,10 +28,8 @@ RUN add-apt-repository -y ppa:webupd8team/java && apt-get update -qq && DEBIAN_F
 # Install Git-lfs
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash \
     &&DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install git-lfs \
-    && git lfs install
-
-# Cleanup
-RUN apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+    && git lfs install \
+    && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 
 # Go to workspace
 RUN mkdir -p /var/workspace
