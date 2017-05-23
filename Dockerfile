@@ -1,4 +1,4 @@
-FROM meitu/android-base:latest
+FROM ubuntu:16.04
 
 LABEL maintainer "Ligboy.Liu <ligboy@gmail.com>"
 
