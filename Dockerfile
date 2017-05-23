@@ -4,7 +4,6 @@ LABEL maintainer "Ligboy.Liu <ligboy@gmail.com>"
 
 # Environments
 # - Language
-RUN locale-gen en_US.UTF-8
 ENV LANG "en_US.UTF-8"
 ENV LANGUAGE "en_US.UTF-8"
 ENV LC_ALL "en_US.UTF-8"
@@ -14,6 +13,7 @@ ENV LC_ALL "en_US.UTF-8"
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     && dpkg --add-architecture i386 \
     && apt-get install -y --no-install-recommends \
+    language-pack-en \
     curl \
     debconf-utils \
     git \
@@ -31,6 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     libncurses5:i386 \
     libstdc++6:i386 \
     libz1:i386 \
+    && locale-gen en_US.UTF-8 \
     && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 
 # ------------------------------------------------------
@@ -50,8 +51,8 @@ RUN git config --global user.email robot@meitu.com && git config --global user.n
 ## Open JDK
 #RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y openjdk-8-jdk
 ## Oracle JDK
-RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | /usr/bin/debconf-set-selections
-RUN add-apt-repository -y ppa:webupd8team/java \
+RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | /usr/bin/debconf-set-selections \
+    && add-apt-repository -y ppa:webupd8team/java \
     && DEBIAN_FRONTEND=noninteractive apt-get update -y -qq \
     && apt-get install -y --no-install-recommends \
     oracle-java8-installer \
