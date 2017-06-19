@@ -10,9 +10,9 @@ ENV LC_ALL "en_US.UTF-8"
 
 # ------------------------------------------------------
 # --- Base pre-installed tools
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
-    && dpkg --add-architecture i386 \
-    && apt-get install -y --no-install-recommends \
+RUN DEBIAN_FRONTEND=noninteractive dpkg --add-architecture i386 \
+    && apt-get update -qq \
+    && apt-get install -y \
     language-pack-en \
     curl \
     debconf-utils \
