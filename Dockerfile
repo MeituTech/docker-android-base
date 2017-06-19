@@ -26,6 +26,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     unzip \
     wget \
     zip \
+    libc6:i386 \
+    libgcc1:i386 \
+    libncurses5:i386 \
+    libstdc++6:i386 \
+    libz1:i386 \
     gcc-multilib \
     g++-multilib \
     libc6-dev-i386 \
