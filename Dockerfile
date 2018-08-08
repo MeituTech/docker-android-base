@@ -6,8 +6,7 @@ ENV ANDROID_HOME /opt/android-sdk
 ENV ANDROID_SDK_ROOT /opt/android-sdk
 
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
-
-RUN mkdir -p ${ANDROID_SDK_ROOT} && touch ~/.android/repositories.cfg
+RUN mkdir -p /root/.android && touch /root/.android/repositories.cfg && mkdir -p ${ANDROID_SDK_ROOT}
 
 RUN cd /opt \
   && wget -q https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -O android-sdk-tools.zip \
