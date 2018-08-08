@@ -1,73 +1,67 @@
-FROM ubuntu:16.04
+FROM meitu/jdk:latest
 
 LABEL maintainer "Ligboy.Liu <ligboy@gmail.com>"
 
-# Environments
-# - Language
-ENV LANG "en_US.UTF-8"
-ENV LANGUAGE "en_US.UTF-8"
-ENV LC_ALL "en_US.UTF-8"
+ENV ANDROID_HOME /opt/android-sdk
+ENV ANDROID_SDK_ROOT /opt/android-sdk
 
-# ------------------------------------------------------
-# --- Base pre-installed tools
-RUN DEBIAN_FRONTEND=noninteractive dpkg --add-architecture i386 \
-    && apt-get update -qq \
-    && apt-get install -y \
-    language-pack-en \
-    curl \
-    debconf-utils \
-    git \
-    mercurial \
-    python \
-    python-software-properties \
-    sudo \
-    software-properties-common \
-    tree \
-    unzip \
-    wget \
-    zip \
-    libc6:i386 \
-    libgcc1:i386 \
-    libncurses5:i386 \
-    libstdc++6:i386 \
-    libz1:i386 \
-    gcc-multilib \
-    g++-multilib \
-    libc6-dev-i386 \
-    build-essential \
-    && locale-gen en_US.UTF-8 \
-    && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
 
-# ------------------------------------------------------
-# --- SSH config
-RUN mkdir -p /root/.ssh
-COPY ./ssh/config /root/.ssh/config
+RUN mkdir -p ${ANDROID_SDK_ROOT} && touch ~/.android/repositories.cfg
 
-# ------------------------------------------------------
-# --- Git config
-RUN git config --global user.email robot@meitu.com && git config --global user.name "Meitu Robot"
+RUN cd /opt \
+  && wget -q https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -O android-sdk-tools.zip \
+  && unzip -qq android-sdk-tools.zip \
+  && mv tools/ ${ANDROID_SDK_ROOT}/tools/ \
+  && rm -f android-sdk-tools.zip \
+  && yes | sdkmanager --licenses
 
-# ------------------------------------------------------
-# --- Android Debug Keystore
-#RUN mkdir -p /root/.android
-#COPY ./android/debug.keystore /root/.android/debug.keystore
+RUN sdkmanager "build-tools;21.1.2"
+RUN sdkmanager "build-tools;22.0.1"
+RUN sdkmanager "build-tools;23.0.1"
+RUN sdkmanager "build-tools;23.0.2"
+RUN sdkmanager "build-tools;23.0.3"
+RUN sdkmanager "build-tools;24.0.1"
+RUN sdkmanager "build-tools;24.0.2"
+RUN sdkmanager "build-tools;24.0.3"
+RUN sdkmanager "build-tools;24.0.0"
+RUN sdkmanager "build-tools;25.0.0"
+RUN sdkmanager "build-tools;25.0.1"
+RUN sdkmanager "build-tools;25.0.2"
+RUN sdkmanager "build-tools;25.0.3"
+RUN sdkmanager "build-tools;26.0.0"
+RUN sdkmanager "build-tools;26.0.1"
+RUN sdkmanager "build-tools;26.0.2"
+RUN sdkmanager "build-tools;26.0.3"
+RUN sdkmanager "build-tools;27.0.0"
+RUN sdkmanager "build-tools;27.0.1"
+RUN sdkmanager "build-tools;27.0.2"
+RUN sdkmanager "build-tools;27.0.3"
+RUN sdkmanager "build-tools;28.0.0"
+RUN sdkmanager "build-tools;28.0.1"
+RUN sdkmanager "build-tools;28.0.2"
 
-## Open JDK
-#RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && apt-get install -y openjdk-8-jdk
-## Oracle JDK
-RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | /usr/bin/debconf-set-selections \
-    && add-apt-repository -y ppa:webupd8team/java \
-    && DEBIAN_FRONTEND=noninteractive apt-get update -y -qq \
-    && apt-get install -y --no-install-recommends \
-    oracle-java8-installer \
-    oracle-java8-set-default \
-    && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+RUN sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.0"
+RUN sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.1"
+RUN sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.0"
+RUN sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1"
 
-# Install Git-lfs
-RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash \
-    &&DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install git-lfs \
-    && git lfs install \
-    && apt-get clean -y && apt-get autoremove -y && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+RUN sdkmanager "platforms;android-21"
+RUN sdkmanager "platforms;android-22"
+RUN sdkmanager "platforms;android-23"
+RUN sdkmanager "platforms;android-24"
+RUN sdkmanager "platforms;android-25"
+RUN sdkmanager "platforms;android-26"
+RUN sdkmanager "platforms;android-27"
+
+RUN sdkmanager "add-ons;addon-google_apis-google-21"
+RUN sdkmanager "add-ons;addon-google_apis-google-22"
+RUN sdkmanager "add-ons;addon-google_apis-google-23"
+RUN sdkmanager "add-ons;addon-google_apis-google-24"
+RUN sdkmanager "extras;android;m2repository"
+RUN sdkmanager "extras;google;m2repository"
+
+RUN apt-get clean -y && apt-get autoremove -y & rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 
 # Go to workspace
 RUN mkdir -p /var/workspace
